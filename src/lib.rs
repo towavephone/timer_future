@@ -8,6 +8,8 @@ use std::{
 };
 
 pub struct TimerFuture {
+    // Arc 多线程下的引用计数，可以做到一个值有多个所有者
+    // Mutex 线程锁
     shared_state: Arc<Mutex<SharedState>>,
 }
 
@@ -26,6 +28,7 @@ impl Future for TimerFuture {
         // 通过检查共享状态，来确定定时器是否已经完成
         let mut shared_state = self.shared_state.lock().unwrap();
         if shared_state.completed {
+            println!("Ready");
             Poll::Ready(())
         } else {
             // 设置`waker`，这样新线程在睡眠(计时)结束后可以唤醒当前的任务，接着再次对`Future`进行`poll`操作,
@@ -34,6 +37,7 @@ impl Future for TimerFuture {
             // 选择每次都`clone`的原因是： `TimerFuture`可以在执行器的不同任务间移动，如果只克隆一次，
             // 那么获取到的`waker`可能已经被篡改并指向了其它任务，最终导致执行器运行了错误的任务
             shared_state.waker = Some(cx.waker().clone());
+            println!("Pending");
             Poll::Pending
         }
     }

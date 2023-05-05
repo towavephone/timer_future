@@ -93,7 +93,7 @@ fn main() {
     // 生成一个任务
     spawner.spawn(async {
         println!("howdy!");
-        // 创建定时器Future，并等待它完成
+        // 创建定时器 Future，并等待它完成
         TimerFuture::new(Duration::new(5, 0)).await;
         println!("done!");
     });
@@ -102,6 +102,6 @@ fn main() {
     drop(spawner);
 
     // 运行执行器直到任务队列为空
-    // 任务运行后，会先打印`howdy!`, 暂停2秒，接着打印 `done!`
+    // 任务运行后，会先打印`howdy!`, 暂停 5 秒，接着打印 `done!`
     executor.run();
 }
